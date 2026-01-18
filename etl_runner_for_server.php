@@ -40,8 +40,8 @@ if ($providedToken !== $SECRET_TOKEN) {
 }
 
 try {
-    // ETL scripts location
-    $etlDir = '/root/etl';
+    // ETL scripts location - files are at filesystem root /
+    $etlDir = '/';
     
     $scripts = [
         'mssql_to_purchase_tax.py',
