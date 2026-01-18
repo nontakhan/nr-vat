@@ -71,6 +71,10 @@ class Database {
             );
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+            
+            // Force UTF-8 encoding for Thai characters
+            $this->conn->exec("SET NAMES utf8mb4");
+            $this->conn->exec("SET CHARACTER SET utf8mb4");
         } catch(PDOException $e) {
             error_log("Connection Error: " . $e->getMessage());
             throw new Exception("ไม่สามารถเชื่อมต่อฐานข้อมูลได้");

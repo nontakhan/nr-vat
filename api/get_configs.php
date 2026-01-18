@@ -142,7 +142,7 @@ try {
             'start' => $startDate,
             'end' => $endDate
         ]
-    ], JSON_UNESCAPED_UNICODE);
+    ], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
     
 } catch (Exception $e) {
     http_response_code(500);
