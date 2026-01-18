@@ -6,7 +6,7 @@ ini_set('display_errors', 0);
 try {
     // Define ETL scripts
     $baseDir = dirname(__DIR__); // Root directory
-    $etlDir = $baseDir . '/etl';
+    $etlDir = $baseDir . '/root/etl';
     
     $scripts = [
         'etl_vat_purchase_tax.py',
