@@ -7,7 +7,7 @@
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 
-require_once '../config/database.php';
+require_once __DIR__ . '/../config/database.php';
 
 // ตรวจสอบ parameters
 $report_id = isset($_GET['report_id']) ? intval($_GET['report_id']) : 0;
