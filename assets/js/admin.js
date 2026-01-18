@@ -32,6 +32,7 @@ $(document).ready(function () {
         deleteConfig(reportId, reportName);
     });
 
+
     // Generate SQL Preview button
     $(document).on('click', '#btnGenerateSQL', generateSQLPreview);
 
@@ -39,7 +40,87 @@ $(document).ready(function () {
     $('button[data-bs-target="#preview"]').on('shown.bs.tab', function () {
         generateSQLPreview();
     });
+
+    // Sync ETL Button
+    $('#btnSyncETL').on('click', syncETL);
 });
+
+/**
+ * Sync ETL Data
+ */
+function syncETL() {
+    Swal.fire({
+        title: 'กำลังประมวลผล...',
+        text: 'ระบบกำลังทำงาน 3 Script (Purchase Tax, Other Income, All Transactions)',
+        icon: 'info',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    $.ajax({
+        url: '../api/run_etl.php',
+        method: 'POST',
+        dataType: 'json',
+        success: function (response) {
+            Swal.close();
+
+            if (response.success) {
+                let details = '';
+                if (response.results) {
+                    details = '<br><small class="text-muted" style="font-size:0.8em">';
+                    response.results.forEach(res => {
+                        const icon = res.status === 'success' ? '✅' : '❌';
+                        details += `${icon} ${res.script}<br>`;
+                    });
+                    details += '</small>';
+                }
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sync เสร็จสมบูรณ์',
+                    html: `รันครบ 3 ไฟล์เรียบร้อยแล้ว${details}`,
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            } else {
+                let errorHtml = '<div class="text-start mt-2"><small>';
+                if (response.results) {
+                    response.results.forEach(res => {
+                        if (res.status === 'error') {
+                            errorHtml += `<div class="text-danger">❌ ${res.script}:<br>${res.message}</div>`;
+                            if (res.output) errorHtml += `<div class="bg-light p-1 border mb-2 text-muted" style="font-size:0.8em">${res.output}</div>`;
+                        } else {
+                            errorHtml += `<div class="text-success">✅ ${res.script}: OK</div>`;
+                        }
+                    });
+                } else {
+                    errorHtml += `<span class="text-danger">${response.message}</span>`;
+                }
+                errorHtml += '</small></div>';
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'พบข้อผิดพลาด',
+                    html: errorHtml,
+                    width: '600px'
+                });
+            }
+        },
+        error: function (xhr, status, error) {
+            Swal.close();
+            console.error('ETL Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'เกิดข้อผิดพลาด',
+                text: 'ไม่สามารถเรียกใช้งาน API Sync ETL ได้ (โปรดตรวจสอบว่ามีไฟล์ Python อยู่จริง)'
+            });
+        }
+    });
+}
+
 
 /**
  * Load all configurations

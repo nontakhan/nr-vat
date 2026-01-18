@@ -45,9 +45,12 @@
     <main class="container mt-4" style="max-width: 1400px;">
         <!-- Action Buttons -->
         <div class="row mb-4">
-            <div class="col-12">
+            <div class="col-12 d-flex gap-2">
                 <button id="btnAddConfig" class="btn btn-danger btn-lg">
                     <i class="fas fa-plus-circle"></i> เพิ่มรายงานใหม่
+                </button>
+                <button id="btnSyncETL" class="btn btn-primary btn-lg">
+                    <i class="fas fa-sync"></i> Sync ETL
                 </button>
             </div>
         </div>
