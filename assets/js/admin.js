@@ -572,21 +572,63 @@ function copySQL(type) {
     const element = type === 'summary' ? $('#sqlPreviewSummary') : $('#sqlPreviewDetail');
     const text = element.text();
 
-    navigator.clipboard.writeText(text).then(() => {
-        Swal.fire({
-            icon: 'success',
-            title: 'คัดลอกแล้ว!',
-            text: 'SQL ถูกคัดลอกไปยังคลิปบอร์ดแล้ว',
-            timer: 1500,
-            showConfirmButton: false
+    // Try modern Clipboard API first (HTTPS/localhost only)
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => {
+            Swal.fire({
+                icon: 'success',
+                title: 'คัดลอกแล้ว!',
+                text: 'SQL ถูกคัดลอกไปยังคลิปบอร์ดแล้ว',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }).catch(() => {
+            fallbackCopyToClipboard(text);
         });
-    }).catch(() => {
+    } else {
+        // Fallback for HTTP (non-secure contexts)
+        fallbackCopyToClipboard(text);
+    }
+}
+
+/**
+ * Fallback copy method for HTTP/non-secure contexts
+ */
+function fallbackCopyToClipboard(text) {
+    // Create temporary textarea
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.left = '-9999px';
+    textarea.style.top = '-9999px';
+    document.body.appendChild(textarea);
+
+    // Select and copy
+    textarea.select();
+    textarea.setSelectionRange(0, 99999); // For mobile devices
+
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            Swal.fire({
+                icon: 'success',
+                title: 'คัดลอกแล้ว!',
+                text: 'SQL ถูกคัดลอกไปยังคลิปบอร์ดแล้ว',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        } else {
+            throw new Error('Copy failed');
+        }
+    } catch (err) {
         Swal.fire({
             icon: 'error',
             title: 'ไม่สามารถคัดลอกได้',
             text: 'กรุณาคัดลอกด้วยตนเอง'
         });
-    });
+    } finally {
+        document.body.removeChild(textarea);
+    }
 }
 
 /**
