@@ -53,20 +53,44 @@ try {
         throw new Exception('ตาราง join ไม่ได้รับอนุญาต');
     }
 
+    // Get main table name first for default columns
+    $main_table = $config['main_table'];
+
     // Parse display columns
     $display_columns = $config['display_columns'] ? json_decode($config['display_columns'], true) : [];
     if (empty($display_columns)) {
-        // Default columns ถ้าไม่ได้กำหนด
-        $display_columns = [
-            ['column' => 'a.DOCNO', 'label' => 'เลขที่เอกสาร'],
-            ['column' => 'a.DOCDATE', 'label' => 'วันที่'],
-            ['column' => 'a.CUSTNAME', 'label' => 'ชื่อลูกค้า'],
-            ['column' => 'a.NETAMOUNT', 'label' => 'ยอดเงิน']
-        ];
+        // Default columns ตาม main_table
+        switch ($main_table) {
+            case 'purchase_tax':
+                $display_columns = [
+                    ['column' => 'a.docno', 'label' => 'เลขที่เอกสาร'],
+                    ['column' => 'a.docdate', 'label' => 'วันที่'],
+                    ['column' => 'a.CUSTNAME', 'label' => 'ชื่อลูกค้า/ผู้ขาย'],
+                    ['column' => 'a.lname', 'label' => 'ประเภท'],
+                    ['column' => 'a.sumamount1b', 'label' => 'ยอดก่อนภาษี'],
+                    ['column' => 'a.taxamount', 'label' => 'ภาษี']
+                ];
+                break;
+            case 'other_income_expense':
+                $display_columns = [
+                    ['column' => 'a.docno', 'label' => 'เลขที่เอกสาร'],
+                    ['column' => 'a.docdate', 'label' => 'วันที่'],
+                    ['column' => 'a.custname', 'label' => 'ชื่อลูกค้า'],
+                    ['column' => 'a.productname', 'label' => 'รายการ'],
+                    ['column' => 'a.NETAMOUNT', 'label' => 'ยอดเงิน']
+                ];
+                break;
+            default: // all_transactions
+                $display_columns = [
+                    ['column' => 'a.DOCNO', 'label' => 'เลขที่เอกสาร'],
+                    ['column' => 'a.DOCDATE', 'label' => 'วันที่'],
+                    ['column' => 'a.CUSTNAME', 'label' => 'ชื่อลูกค้า'],
+                    ['column' => 'a.NETAMOUNT', 'label' => 'ยอดเงิน']
+                ];
+        }
     }
 
-    // สร้าง SQL query แบบ dynamic
-    $main_table = $config['main_table'];
+    // สร้าง SQL query แบบ dynamic (main_table already defined above)
     $join_table = $config['join_table'];
     $join_condition = $config['join_condition'];
     $money_type_column = $config['money_type_column'];
