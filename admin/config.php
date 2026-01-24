@@ -57,10 +57,22 @@
 
         <!-- Config Table -->
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">
                     <i class="fas fa-list"></i> รายการตั้งค่ารายงาน
                 </h5>
+                <div class="search-box">
+                    <div class="input-group" style="width: 300px;">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0" id="searchInput" 
+                               placeholder="ค้นหาชื่อรายงาน..." autocomplete="off">
+                        <button class="btn btn-outline-secondary" type="button" id="clearSearch" style="display: none;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">

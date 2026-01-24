@@ -43,6 +43,27 @@ $(document).ready(function () {
 
     // Sync ETL Button
     $('#btnSyncETL').on('click', syncETL);
+
+    // Real-time search functionality
+    $('#searchInput').on('input', function () {
+        const searchTerm = $(this).val().trim();
+        filterConfigs(searchTerm);
+
+        // Show/hide clear button
+        if (searchTerm.length > 0) {
+            $('#clearSearch').show();
+        } else {
+            $('#clearSearch').hide();
+        }
+    });
+
+    // Clear search button
+    $('#clearSearch').on('click', function () {
+        $('#searchInput').val('');
+        $(this).hide();
+        filterConfigs('');
+        $('#searchInput').focus();
+    });
 });
 
 /**
@@ -193,6 +214,58 @@ function displayConfigs(configs) {
     });
 
     $('#configTableBody').html(html);
+}
+
+/**
+ * Filter configurations based on search term (real-time search)
+ */
+function filterConfigs(searchTerm) {
+    const rows = $('#configTableBody tr');
+
+    if (!searchTerm) {
+        // Show all rows
+        rows.show();
+        return;
+    }
+
+    // Convert search term to lowercase for case-insensitive search
+    const searchLower = searchTerm.toLowerCase();
+
+    rows.each(function () {
+        const $row = $(this);
+        const reportName = $row.find('strong').text().toLowerCase();
+        const mainTable = $row.find('code').first().text().toLowerCase();
+        const joinTable = $row.find('code').eq(1).text().toLowerCase();
+
+        // Check if any field contains the search term
+        if (reportName.includes(searchLower) ||
+            mainTable.includes(searchLower) ||
+            joinTable.includes(searchLower)) {
+            $row.show();
+        } else {
+            $row.hide();
+        }
+    });
+
+    // Check if no results found
+    const visibleRows = rows.filter(':visible');
+    if (visibleRows.length === 0) {
+        // Remove existing no-results message if any
+        $('#configTableBody .no-results-row').remove();
+
+        // Add no results message
+        $('#configTableBody').append(`
+            <tr class="no-results-row">
+                <td colspan="7" class="text-center text-muted py-4">
+                    <i class="fas fa-search"></i>
+                    <p class="mt-2 mb-0">ไม่พบรายงานที่ตรงกับ "${escapeHtml(searchTerm)}"</p>
+                </td>
+            </tr>
+        `);
+    } else {
+        // Remove no-results message if visible rows exist
+        $('#configTableBody .no-results-row').remove();
+    }
 }
 
 /**
